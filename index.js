@@ -13,12 +13,12 @@ const fileNames = process.argv
 
 let rawdata = fs.readFileSync(fileNames[2]);
 let { actions } = JSON.parse(rawdata);
-console.log(actions[1].options.url);
+
 
 const requestAction = "HTTPRequestAction"
 const printActioin = "PrintAction"
 // let location = {}
-const urlString = actions[1].options.url
+// const urlString = actions[1].options.url
 const baseUrl = ""
 let requestObject = {}
 
@@ -30,8 +30,9 @@ const getData = async (link) => {
             link
         );
 
-        //   location = response.data
-        //   console.log(location)
+        location = response.data
+        // console.log(location)
+        
         return response.data
     } catch (err) {
         console.error(err);
@@ -43,11 +44,17 @@ const actionHandler = async () => {
         switch (actions[i].type) {
             case requestAction:
                 const { options: { url } } = actions[i]
-                let `${actions[i].name}` = await getData(url)
-                console.log(actions[i].name)
+                // console.log(url)
+                let response = await getData(url)
+                // console.log(response)
+
+                eval(`${actions[i].name}` + " = response");
+                let myObject = {}
                 
-                
-                const {longitude, latitude} = location
+                console.log(eval(`${actions[i].name}`));
+
+
+                const { longitude, latitude } = location
                 // console.log(location)
                 break;
             case printActioin:
@@ -58,6 +65,7 @@ const actionHandler = async () => {
                 break;
         }
 }
+
 
 actionHandler()
 

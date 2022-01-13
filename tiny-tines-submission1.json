@@ -1,0 +1,12 @@
+{
+    "actions": [
+      {
+        "type": "HTTPRequestAction",
+        "name": "location",
+        "options": {
+          "url": "http://free.ipwhois.io/json/"
+        }
+      }
+    ]
+  }
+  
