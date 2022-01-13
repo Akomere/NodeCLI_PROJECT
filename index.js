@@ -15,8 +15,9 @@ let rawdata = fs.readFileSync(fileNames[2]);
 let { actions } = JSON.parse(rawdata);
 
 
+
 const requestAction = "HTTPRequestAction"
-const printActioin = "PrintAction"
+const printAction = "PrintAction"
 // let location = {}
 // const urlString = actions[1].options.url
 const baseUrl = ""
@@ -29,10 +30,8 @@ const getData = async (link) => {
         const response = await axios.get(
             link
         );
-
         location = response.data
-        // console.log(location)
-        
+        // console.log(location) 
         return response.data
     } catch (err) {
         console.error(err);
@@ -49,15 +48,28 @@ const actionHandler = async () => {
                 // console.log(response)
 
                 eval(`${actions[i].name}` + " = response");
-                let myObject = {}
                 
-                console.log(eval(`${actions[i].name}`));
+                // const {longitude} = location
+                // console.log(actions[i+1])
+                
+                const myUrl = actions[i].options.url
+                console.log(myUrl)
+                // try {
+                //     const response = await axios.get(
+                //         myUrl
+                //     );
+                //     result = response.data
+                //     console.log(result) 
+                     
+                // } catch (err) {
+                //     console.error(err);
+                // }
 
 
-                const { longitude, latitude } = location
+                // const { longitude, latitude } = location
                 // console.log(location)
                 break;
-            case printActioin:
+            case printAction:
                 console.log("PRINT")
                 break;
 
