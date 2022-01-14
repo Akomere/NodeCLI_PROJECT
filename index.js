@@ -17,11 +17,11 @@ let { actions } = JSON.parse(rawdata);
 const requestAction = "HTTPRequestAction"
 const printAction = "PrintAction"
 // let location = {}
-const urlString = actions[1].options.url
-console.log(urlString)
-const baseUrl = ""
+// const urlString = actions[1].options.url
+// console.log(urlString)
+
 let requestObject = {}
-var eventVal = {}
+
 
 
 
@@ -29,43 +29,52 @@ var eventVal = {}
 const index = (obj, i) => (
     obj[i]
 )
+const insertParam = (stringValue, paramArr) => {
+    let idx = 0
+    let i = 0;
 
-const urlHandler = () => {
+    while (i < stringValue.length) {
+        if (stringValue[i] === '=') {
+            //insert string
+            stringValue = [stringValue.slice(0, i), paramArr[idx], stringValue.slice(i)].join('');
+            idx++
+        }
+        i++
+    }
 
+    return stringValue
+}
+
+const urlHandler = (urlString, eventObj) => {
     let newString = ''
     let idx = 0
-    let words = []
-
+    let values = []
     while (idx < urlString.length) {
         if (urlString[idx] == '{' && urlString[idx + 1] == '{') {
             let j = idx + 2
+            if (urlString[j] === '}' && urlString[j + 1] != '}') {
+                let emptyString = ""
+                return emptyString
+            }
             while (urlString[j] != '}') {
                 j++
             }
-            console.log(urlString[j])
-
             let param = urlString.slice(idx + 2, j)
-            let list = param.split('.')
-
-
-            words.push(list)
-            console.log(words)
+            let interpolatedValue = param.split('.').reduce(index, eventObj)
+            values.push(interpolatedValue)
+            // console.log(words)
             idx = j + 2
-
-
-
         }
         else {
             newString += urlString[idx]
             idx++
-            console.log(newString)
+            // console.log(newString, values)
         }
-
-
     }
+    return insertParam(newString, values)
 }
 
-const getData = async (link, name = "") => {
+const getData = async (link, name = "", eventData) => {
 
     // if (eventVal.length !== 0) {
     //     eval(name + " = eventVal.name");
@@ -74,26 +83,31 @@ const getData = async (link, name = "") => {
         const response = await axios.get(
             link
         );
-        eventVal[name] = response.data
-
-        let result = 'location.longitude'.split('.').reduce(index, eventVal)
-        console.log(result)
-
-
-        // console.log("event")
+        eventData[name] = response.data
+        return eventData
     } catch (err) {
         console.error(err);
     }
 }
 
 const actionHandler = async () => {
-    for (let i = 0; i < 1; i++)
+    var eventVal = {}
+    for (let i = 0; i < 2; i++) {
         switch (actions[i].type) {
             case requestAction:
                 const { options: { url } } = actions[i]
                 actionName = actions[i].name
-                getData(url, actionName)
-                console.log(eventVal)
+                if (i === 0) {
+                    //peform normal get request
+                    eventVal = await getData(url, actionName, eventVal)
+
+                } else {
+                    //handle url and peform get request
+                    let interpolatedUrl = urlHandler(url, eventVal)
+                    console.log(interpolatedUrl)
+                    eventVal = await getData(interpolatedUrl, actionName, eventVal)
+                }
+
 
                 // const {longitude} = location
                 // console.log(actions[i+1])
@@ -120,9 +134,8 @@ const actionHandler = async () => {
             default:
                 break;
         }
-
-    console.log(eventVal)
-
+    }
+    // console.log(eventVal)
 }
 
 
