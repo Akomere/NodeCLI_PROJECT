@@ -36,7 +36,7 @@ const insertParam = (stringValue, paramArr) => {
     while (i < stringValue.length) {
         if (stringValue[i] === '=') {
             //insert string
-            stringValue = [stringValue.slice(0, i), paramArr[idx], stringValue.slice(i)].join('');
+            stringValue = [stringValue.slice(0, i+1), paramArr[idx], stringValue.slice(i+1)].join('');
             idx++
         }
         i++
