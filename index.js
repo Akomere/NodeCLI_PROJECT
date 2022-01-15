@@ -5,7 +5,10 @@ const fileNames = process.argv
 
 let rawdata = fs.readFileSync(fileNames[2]);
 let { actions } = JSON.parse(rawdata);
-const isBalanced = require("./modules/isBalanced")
+const isBalanced = require("./modules/isBalanced");
+const stringHandler = require("./modules/stringHandler");
+const interpolateString = require("./modules/interpolateString")
+// const stringHandler = require("./modules/stringHandler")
 // import { isBalanced } from "./bracketBalancer/isBalanced";
 
 
@@ -13,59 +16,45 @@ const requestAction = "HTTPRequestAction"
 const printAction = "PrintAction"
 
 
-const interpolateString = (stringVal, param) => {
-    for (let i = 0; i < param.length; i++) {
-        stringVal = stringVal.replace('}', param[i])
-    }
-    return stringVal
-}
-
-// const isBalanced = (inputString) => {
-//     let stack = []
-//     for (let i = 0; i < inputString.length; i++) {
-//         if (inputString[i] == '{') {
-//             stack.push(inputString[i])
-//             continue;
-//         } else if (inputString[i] == '}' && stack.length == 0) {
-//             return false;
-//         } else if (inputString[i] == '}') {
-//             stack.pop()
-//         }
+// const interpolateString = (stringVal, param) => {
+//     for (let i = 0; i < param.length; i++) {
+//         stringVal = stringVal.replace('}', param[i])
 //     }
-//     return (stack.length == 0)
+//     return stringVal
 // }
 
-const index = (obj, i) => (
-    obj && obj[i]
-)
+// const index = (obj, i) => (
+//     obj && obj[i]
+// )
 
-const stringHandler = (urlString, eventObj) => {
-    let newString = ''
-    let idx = 0
-    let values = []
-    while (idx < urlString.length) {
+// const stringHandler = (urlString, eventObj) => {
+//     let newString = ''
+//     let idx = 0
+//     let values = []
+//     while (idx < urlString.length) {
 
-        if (urlString[idx] == '{' && urlString[idx + 1] == '{') {
-            let j = idx + 2
-            while (urlString[j] != '}') {
-                j++
-            }
-            let param = urlString.slice(idx + 2, j)
-            let interpolatedValue = param.split('.').reduce(index, eventObj)
-            values.push(interpolatedValue)
-            idx = j + 1
-        }
-        else {
-            newString += urlString[idx]
-            idx++
-        }
-    }
-    if (values.some(item => item === undefined)) {
-        newString = newString.replace(/}/gi, '')
-        return newString
-    }
-    return interpolateString(newString, values)
-}
+//         if (urlString[idx] == '{' && urlString[idx + 1] == '{') {
+//             let j = idx + 2
+//             while (urlString[j] != '}') {
+//                 j++
+//             }
+//             let param = urlString.slice(idx + 2, j)
+//             let interpolatedValue = param.split('.').reduce(index, eventObj)
+//             values.push(interpolatedValue)
+//             idx = j + 1
+//         }
+//         else {
+//             newString += urlString[idx]
+//             idx++
+//         }
+//     }
+//     if (values.some(item => item === undefined)) {
+//         newString = newString.replace(/}/gi, '')
+//         return newString
+//     }
+//     // return interpolateString(newString, values)
+//     return [newString, values]
+// }
 
 const getData = async (link, name = "", eventData) => {
     try {
@@ -91,7 +80,10 @@ const actionHandler = async () => {
 
                 } else {
                     //handle url and peform get request
-                    let interpolatedUrl = stringHandler(url, eventVal)
+                    // let interpolatedUrl = stringHandler(url, eventVal)
+
+                    let [inputString , valueArr] = stringHandler(url, eventVal)
+                    let interpolatedUrl = interpolateString(inputString, valueArr)
                     eventVal = await getData(interpolatedUrl, actionName, eventVal)
                 }
                 break;
@@ -101,7 +93,9 @@ const actionHandler = async () => {
                 if (!balanced) {
                     console.log(message)
                 } else {
-                    let interpolatedString = stringHandler(message, eventVal)
+                    // let interpolatedString = stringHandler(message, eventVal)
+                    let [inputString, valueArr] = stringHandler(message, eventVal)
+                    let interpolatedString = interpolateString(inputString, valueArr)
                     console.log(interpolatedString)
                 }
                 break;
