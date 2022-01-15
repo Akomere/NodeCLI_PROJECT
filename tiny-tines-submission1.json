@@ -8,11 +8,19 @@
             }
         },
         {
+            "type": "PrintAction",
+            "name": "print",
+            "options": {
+                "message": "Sunset in {{location.city}}, {{location.country}} is at {{sunset.results.sunset}}."
+            }
+        },
+        {
             "type": "HTTPRequestAction",
             "name": "sunset",
             "options": {
                 "url": "https://api.sunrise-sunset.org/json?lat={{location.latitude}}&lng={{location.longitude}}"
             }
         }
+
     ]
 }

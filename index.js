@@ -20,11 +20,16 @@ const printAction = "PrintAction"
 // const urlString = actions[1].options.url
 // console.log(urlString)
 
-let requestObject = {}
 
-
-
-
+const interpolateString = (stringVal, param) => {
+    console.log(param)
+    for (let i = 0; i < param.length; i++) {
+        stringVal = stringVal.replace('}', param[i])
+    }
+    // console.log(stringVal)
+    //console.log(param)
+    return stringVal
+}
 
 const index = (obj, i) => (
     obj[i]
@@ -36,7 +41,7 @@ const insertParam = (stringValue, paramArr) => {
     while (i < stringValue.length) {
         if (stringValue[i] === '=') {
             //insert string
-            stringValue = [stringValue.slice(0, i+1), paramArr[idx], stringValue.slice(i+1)].join('');
+            stringValue = [stringValue.slice(0, i + 1), paramArr[idx], stringValue.slice(i + 1)].join('');
             idx++
         }
         i++
@@ -71,14 +76,53 @@ const urlHandler = (urlString, eventObj) => {
             // console.log(newString, values)
         }
     }
+    console.log(insertParam(newString, values))
     return insertParam(newString, values)
 }
 
-const getData = async (link, name = "", eventData) => {
+const printHandler = (urlString, eventObj) => {
+    let newString = ''
+    let idx = 0
+    let values = []
+    while (idx < urlString.length) {
 
-    // if (eventVal.length !== 0) {
-    //     eval(name + " = eventVal.name");
-    // }
+        //if an openeing curly brace is found, it is an error, return urlString
+
+        if (urlString[idx] == '{' && urlString[idx + 1] == '{') {
+            let j = idx + 2
+            // while (j < urlString.length) {
+            //     if (urlString[j] === '}' && urlString[j + 1] != '}') {
+            //         let emptyString = ""
+            //         return emptyString
+            //     }
+            // }
+
+            while (urlString[j] != '}') {
+                j++
+            }
+            let param = urlString.slice(idx + 2, j)
+            let interpolatedValue = param.split('.').reduce(index, eventObj)
+            values.push(interpolatedValue)
+            console.log("check for undefined")
+            console.log(values)
+            idx = j + 1
+        }
+        else {
+            newString += urlString[idx]
+            idx++
+            // console.log(newString, values)
+        }
+    }
+    if (values.some(item => item === undefined)) {
+        newString = newString.replace(/}/gi, '')
+        // newString.replace(/}/g,'')
+        return newString
+    }
+
+    return interpolateString(newString, values)
+}
+
+const getData = async (link, name = "", eventData) => {
     try {
         const response = await axios.get(
             link
@@ -92,43 +136,30 @@ const getData = async (link, name = "", eventData) => {
 
 const actionHandler = async () => {
     var eventVal = {}
-    for (let i = 0; i < 2; i++) {
+
+    for (let i = 0; i < actions.length; i++) {
         switch (actions[i].type) {
             case requestAction:
                 const { options: { url } } = actions[i]
                 actionName = actions[i].name
-                if (i === 0) {
+                if (!url.includes('{{')) {
                     //peform normal get request
                     eventVal = await getData(url, actionName, eventVal)
 
                 } else {
                     //handle url and peform get request
-                    let interpolatedUrl = urlHandler(url, eventVal)
-                    console.log(interpolatedUrl)
-                    eventVal = await getData(interpolatedUrl, actionName, eventVal)
+                    console.log("enter second get request")
+                    console.log(url)
+                    let interpolatedUrl = printHandler(url, eventVal)
+                    // console.log(interpolatedUrl)
+                    eventVal = await getData(interpolatedUrl, actionName, eventVal)   
                 }
-
-
-                // const {longitude} = location
-                // console.log(actions[i+1])
-
-                // const myUrl = actions[1].options.url
-                // // console.log(myUrl)
-                // try {
-                //     const response = await axios.get(
-                //         myUrl
-                //     );
-                //     result = response.data
-                //     console.log(result) 
-
-                // } catch (err) {
-                //     console.error(err);
-                // }
-                // const { longitude, latitude } = location
-                // console.log(location)
                 break;
             case printAction:
-                console.log("PRINT")
+                console.log(eventVal)
+                const { options: { message } } = actions[i]
+                let interpolatedString = printHandler(message, eventVal)
+                console.log(interpolatedString)
                 break;
 
             default:
@@ -137,10 +168,7 @@ const actionHandler = async () => {
     }
     // console.log(eventVal)
 }
-
-
 actionHandler()
-
 
 ///////////////////////////////////
 //split the url at the '?' val to get base url
