@@ -32,9 +32,7 @@ const interpolateString = (stringVal, param) => {
 }
 
 const isBalanced = (inputString) => {
-
     let stack = []
-
     for (let i = 0; i < inputString.length; i++) {
         if (inputString[i] == '{') {
             stack.push(inputString[i])
@@ -49,77 +47,18 @@ const isBalanced = (inputString) => {
     return (stack.length == 0)
 }
 
-
-
-
 const index = (obj, i) => (
-    obj[i]
+    obj && obj[i]
 )
-const insertParam = (stringValue, paramArr) => {
-    let idx = 0
-    let i = 0;
 
-    while (i < stringValue.length) {
-        if (stringValue[i] === '=') {
-            //insert string
-            stringValue = [stringValue.slice(0, i + 1), paramArr[idx], stringValue.slice(i + 1)].join('');
-            idx++
-        }
-        i++
-    }
-
-    return stringValue
-}
-
-// const urlHandler = (urlString, eventObj) => {
-//     let newString = ''
-//     let idx = 0
-//     let values = []
-//     while (idx < urlString.length) {
-//         if (urlString[idx] == '{' && urlString[idx + 1] == '{') {
-//             let j = idx + 2
-//             if (urlString[j] === '}' && urlString[j + 1] != '}') {
-//                 let emptyString = ""
-//                 return emptyString
-//             }
-//             while (urlString[j] != '}') {
-//                 j++
-//             }
-//             let param = urlString.slice(idx + 2, j)
-//             let interpolatedValue = param.split('.').reduce(index, eventObj)
-//             values.push(interpolatedValue)
-//             // console.log(words)
-//             idx = j + 2
-//         }
-//         else {
-//             newString += urlString[idx]
-//             idx++
-//             // console.log(newString, values)
-//         }
-//     }
-//     console.log(insertParam(newString, values))
-//     return insertParam(newString, values)
-// }
-
-const printHandler = (urlString, eventObj) => {
+const stringHandler = (urlString, eventObj) => {
     let newString = ''
     let idx = 0
     let values = []
     while (idx < urlString.length) {
 
-        // if (urlString[idx] == '}') {
-        //     return
-        // }
-
         if (urlString[idx] == '{' && urlString[idx + 1] == '{') {
             let j = idx + 2
-            // while (j < urlString.length) {
-            //     if (urlString[j] === '}' && urlString[j + 1] != '}') {
-            //         let emptyString = ""
-            //         return emptyString
-            //     }
-            // }
-
             while (urlString[j] != '}') {
                 j++
             }
@@ -173,7 +112,7 @@ const actionHandler = async () => {
                     //handle url and peform get request
                     console.log("enter second get request")
                     console.log(url)
-                    let interpolatedUrl = printHandler(url, eventVal)
+                    let interpolatedUrl = stringHandler(url, eventVal)
                     // console.log(interpolatedUrl)
                     eventVal = await getData(interpolatedUrl, actionName, eventVal)
                 }
@@ -186,7 +125,7 @@ const actionHandler = async () => {
                 if (!balanced) {
                     console.log(message)
                 } else {
-                    let interpolatedString = printHandler(message, eventVal)
+                    let interpolatedString = stringHandler(message, eventVal)
                     console.log(interpolatedString)
                 }
                 break;
@@ -194,14 +133,10 @@ const actionHandler = async () => {
                 break;
         }
     }
-    // console.log(eventVal)
+  
 }
 actionHandler()
 
-///////////////////////////////////
-//split the url at the '?' val to get base url
-//use brackets to store object strings and split them at '.'
-//
 
 
 
