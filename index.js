@@ -31,6 +31,27 @@ const interpolateString = (stringVal, param) => {
     return stringVal
 }
 
+const isBalanced = (inputString) => {
+
+    let stack = []
+
+    for (let i = 0; i < inputString.length; i++) {
+        if (inputString[i] == '{') {
+            stack.push(inputString[i])
+            continue;
+        } else if (inputString[i] == '}' && stack.length == 0) {
+            console.log("empty stack but there is closing bracket")
+            return false;
+        } else if (inputString[i] == '}') {
+            stack.pop()
+        }
+    }
+    return (stack.length == 0)
+}
+
+
+
+
 const index = (obj, i) => (
     obj[i]
 )
@@ -50,35 +71,35 @@ const insertParam = (stringValue, paramArr) => {
     return stringValue
 }
 
-const urlHandler = (urlString, eventObj) => {
-    let newString = ''
-    let idx = 0
-    let values = []
-    while (idx < urlString.length) {
-        if (urlString[idx] == '{' && urlString[idx + 1] == '{') {
-            let j = idx + 2
-            if (urlString[j] === '}' && urlString[j + 1] != '}') {
-                let emptyString = ""
-                return emptyString
-            }
-            while (urlString[j] != '}') {
-                j++
-            }
-            let param = urlString.slice(idx + 2, j)
-            let interpolatedValue = param.split('.').reduce(index, eventObj)
-            values.push(interpolatedValue)
-            // console.log(words)
-            idx = j + 2
-        }
-        else {
-            newString += urlString[idx]
-            idx++
-            // console.log(newString, values)
-        }
-    }
-    console.log(insertParam(newString, values))
-    return insertParam(newString, values)
-}
+// const urlHandler = (urlString, eventObj) => {
+//     let newString = ''
+//     let idx = 0
+//     let values = []
+//     while (idx < urlString.length) {
+//         if (urlString[idx] == '{' && urlString[idx + 1] == '{') {
+//             let j = idx + 2
+//             if (urlString[j] === '}' && urlString[j + 1] != '}') {
+//                 let emptyString = ""
+//                 return emptyString
+//             }
+//             while (urlString[j] != '}') {
+//                 j++
+//             }
+//             let param = urlString.slice(idx + 2, j)
+//             let interpolatedValue = param.split('.').reduce(index, eventObj)
+//             values.push(interpolatedValue)
+//             // console.log(words)
+//             idx = j + 2
+//         }
+//         else {
+//             newString += urlString[idx]
+//             idx++
+//             // console.log(newString, values)
+//         }
+//     }
+//     console.log(insertParam(newString, values))
+//     return insertParam(newString, values)
+// }
 
 const printHandler = (urlString, eventObj) => {
     let newString = ''
@@ -86,7 +107,9 @@ const printHandler = (urlString, eventObj) => {
     let values = []
     while (idx < urlString.length) {
 
-        //if an openeing curly brace is found, it is an error, return urlString
+        // if (urlString[idx] == '}') {
+        //     return
+        // }
 
         if (urlString[idx] == '{' && urlString[idx + 1] == '{') {
             let j = idx + 2
@@ -152,16 +175,21 @@ const actionHandler = async () => {
                     console.log(url)
                     let interpolatedUrl = printHandler(url, eventVal)
                     // console.log(interpolatedUrl)
-                    eventVal = await getData(interpolatedUrl, actionName, eventVal)   
+                    eventVal = await getData(interpolatedUrl, actionName, eventVal)
                 }
                 break;
             case printAction:
                 console.log(eventVal)
                 const { options: { message } } = actions[i]
-                let interpolatedString = printHandler(message, eventVal)
-                console.log(interpolatedString)
+                const balanced = isBalanced(message)
+                console.log(balanced)
+                if (!balanced) {
+                    console.log(message)
+                } else {
+                    let interpolatedString = printHandler(message, eventVal)
+                    console.log(interpolatedString)
+                }
                 break;
-
             default:
                 break;
         }
