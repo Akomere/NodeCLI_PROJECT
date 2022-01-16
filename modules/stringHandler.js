@@ -24,8 +24,8 @@ module.exports = stringHandler = (urlString, eventObj) => {
     }
     if (values.some(item => item === undefined)) {
         newString = newString.replace(/}/gi, '')
-        return newString
+        
+        return [newString, values]
     }
-    // return interpolateString(newString, values)
     return [newString, values]
 }
