@@ -1,8 +1,6 @@
 var expect = require('chai').expect
 const interpolatedString = require("../modules/interpolateString")
 
-
-
 describe('interpolateString', function () {
     describe('inserts values refrenced objects back into original message or url string', function () {
         
@@ -22,7 +20,5 @@ describe('interpolateString', function () {
             expect(result).to.eql("Sunset in ,  is at .")
         });
 
-    });
-
-    
+    });  
 });

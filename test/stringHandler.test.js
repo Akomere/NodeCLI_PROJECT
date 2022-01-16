@@ -56,6 +56,4 @@ describe('stringHandler', function () {
             expect(resultString).to.equal('Current time:\n\t')
         });
     });
-
-
 });
