@@ -2,9 +2,9 @@ var expect = require('chai').expect
 const getData = require("../modules/getData")
 
 describe('getData', function () {
-    describe('Peforms asynchronous get request of new event data and updates even data object with the event name is key', function () {
+    describe('Peforms asynchronous get request of new event data and updates even data object with the event name as key', function () {
 
-        it('should return return updated event object', async function () {
+        it('should return updated event object', async function () {
             let interpolatedString = "https://api.sunrise-sunset.org/json?lat=53.3498053&lng=-6.2603097"
             let actionName = "sunset"
             let eventData = {

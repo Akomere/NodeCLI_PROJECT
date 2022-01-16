@@ -1,5 +1,7 @@
 #!/usr/bin/env node
 
+//main function
+
 const fs = require('fs');
 const fileNames = process.argv
 
@@ -43,7 +45,6 @@ const actionHandler = async () => {
                 break;
         }
     }
-
 }
 actionHandler()
 

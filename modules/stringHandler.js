@@ -1,3 +1,7 @@
+//takes in message or url as input string and extracts object reference
+//it returns a string with '}' as a place holder: {newString} 
+//and and array of object property refrences: {values}
+
 module.exports = stringHandler = (urlString, eventObj) => {
     const index = (obj, i) => (
         obj && obj[i]

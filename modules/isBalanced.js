@@ -1,3 +1,5 @@
+//This function checks if curly brackets are correctly balanced in a given string and return a boolean
+
 module.exports =  isBalanced = (inputString) => {
     let stack = []
     for (let i = 0; i < inputString.length; i++) {
